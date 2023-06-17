@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone'
     ];
 
     /**
@@ -41,4 +42,25 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+        // serial_no autoincrement
+        protected static function boot()
+        {
+            parent::boot();
+
+            static::creating(function ($model) {
+                $model->serial_no = static::getNextSerial_noValue();
+            });
+        }
+
+        private static function getNextSerial_noValue()
+        {
+            $lastCourse = static::query()->latest('serial_no')->first();
+
+            if (!$lastCourse) {
+                return 1;
+            }
+
+            return $lastCourse->serial_no + 1;
+        }
 }
